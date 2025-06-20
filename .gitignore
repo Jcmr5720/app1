@@ -1,0 +1,7 @@
+# Ignore Gradle and build files
+.gradle/
+**/build/
+# Ignore local configuration
+local.properties
+# Ignore wrapper jar
+gradle/wrapper/gradle-wrapper.jar
