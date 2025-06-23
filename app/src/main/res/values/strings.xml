@@ -5,6 +5,11 @@
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-    <string name="task_hint">Task description</string>
+    <string name="title_hint">Task title</string>
+    <string name="description_hint">Description</string>
+    <string name="confirm_delete">Delete this task?</string>
+    <string name="filter_all">All</string>
+    <string name="filter_completed">Completed</string>
+    <string name="filter_pending">Pending</string>
     <string name="title_tasks">Tasks</string>
 </resources>

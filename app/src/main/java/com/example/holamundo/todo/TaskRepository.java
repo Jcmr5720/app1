@@ -22,6 +22,7 @@ public class TaskRepository {
         void onResult(List<Task> tasks);
     }
 
+    /** Obtiene todas las tareas sin filtrar. */
     public void getTasks(TasksCallback callback) {
         executor.execute(() -> {
             List<Task> tasks = dao.getAll();
@@ -31,8 +32,27 @@ public class TaskRepository {
         });
     }
 
+    /** Obtiene solo las tareas completadas. */
+    public void getCompleted(TasksCallback callback) {
+        executor.execute(() -> {
+            List<Task> tasks = dao.getCompleted();
+            if (callback != null) callback.onResult(tasks);
+        });
+    }
+
+    /** Obtiene solo las tareas pendientes. */
+    public void getPending(TasksCallback callback) {
+        executor.execute(() -> {
+            List<Task> tasks = dao.getPending();
+            if (callback != null) callback.onResult(tasks);
+        });
+    }
+
     public void insert(Task task, Runnable finished) {
         executor.execute(() -> {
+            if (task.createdAt == 0) {
+                task.createdAt = System.currentTimeMillis();
+            }
             dao.insert(task);
             if (finished != null) finished.run();
         });

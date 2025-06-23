@@ -13,5 +13,12 @@ public class Task {
 
     public String title;
 
+    /** Descripción detallada de la tarea. */
+    public String description;
+
+    /** Marca temporal de creación en milisegundos. */
+    public long createdAt;
+
+    /** Indica si la tarea está completada. */
     public boolean completed;
 }

@@ -13,8 +13,17 @@ import java.util.List;
  */
 @Dao
 public interface TaskDao {
-    @Query("SELECT * FROM tasks")
+    // Obtiene todas las tareas ordenadas por fecha de creación.
+    @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     List<Task> getAll();
+
+    // Obtiene solo las tareas completadas.
+    @Query("SELECT * FROM tasks WHERE completed = 1 ORDER BY createdAt DESC")
+    List<Task> getCompleted();
+
+    // Obtiene solo las tareas pendientes.
+    @Query("SELECT * FROM tasks WHERE completed = 0 ORDER BY createdAt DESC")
+    List<Task> getPending();
 
     @Insert
     long insert(Task task);

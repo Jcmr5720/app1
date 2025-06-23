@@ -4,11 +4,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +26,7 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
 
     private TaskAdapter adapter;
     private TaskRepository repository;
+    private String currentFilter = "ALL";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,9 +38,47 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         adapter = new TaskAdapter();
         adapter.setListener(this);
 
+        Spinner spinner = findViewById(R.id.spinner_filter);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.filters, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String[] values = getResources().getStringArray(R.array.filters_values);
+                currentFilter = values[position];
+                loadTasks();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
         RecyclerView recyclerView = findViewById(R.id.recycler_tasks);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        // Manejar deslizamientos para completar o eliminar tareas
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh,
+                                  @NonNull RecyclerView.ViewHolder target) { return false; }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int direction) {
+                Task task = adapter.getTask(vh.getAdapterPosition());
+                if (direction == ItemTouchHelper.RIGHT) {
+                    task.completed = !task.completed;
+                    repository.update(task);
+                    adapter.notifyItemChanged(vh.getAdapterPosition());
+                } else {
+                    onDelete(task);
+                }
+            }
+        });
+        helper.attachToRecyclerView(recyclerView);
 
         FloatingActionButton fab = findViewById(R.id.fab_add);
         fab.setOnClickListener(v -> showAddDialog());
@@ -48,7 +91,17 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
     }
 
     private void loadTasks() {
-        repository.getTasks(tasks -> runOnUiThread(() -> adapter.setTasks(tasks)));
+        TaskRepository.TasksCallback callback = tasks -> runOnUiThread(() -> adapter.setTasks(tasks));
+        switch (currentFilter) {
+            case "DONE":
+                repository.getCompleted(callback);
+                break;
+            case "PENDING":
+                repository.getPending(callback);
+                break;
+            default:
+                repository.getTasks(callback);
+        }
     }
 
     private void showAddDialog() {
@@ -56,7 +109,8 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         // Inflate a fresh instance of the dialog layout each time to avoid
         // reusing a view that already has a parent.
         View dialogView = inflater.inflate(R.layout.dialog_task, null);
-        EditText editText = dialogView.findViewById(R.id.edit_task);
+        EditText editTitle = dialogView.findViewById(R.id.edit_title);
+        EditText editDesc = dialogView.findViewById(R.id.edit_description);
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.add_task)
@@ -64,10 +118,14 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
                 // does not already have a parent when added.
                 .setView(dialogView)
                 .setPositiveButton(R.string.save, (d, w) -> {
-                    String text = editText.getText().toString().trim();
-                    if (!text.isEmpty()) {
+                    String title = editTitle.getText().toString().trim();
+                    String desc = editDesc.getText().toString().trim();
+                    if (title.isEmpty()) {
+                        editTitle.setError(getString(R.string.title_hint));
+                    } else {
                         Task task = new Task();
-                        task.title = text;
+                        task.title = title;
+                        task.description = desc;
                         repository.insert(task, this::loadTasks);
                     }
                 })
@@ -80,17 +138,23 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         // Inflate a new view for the dialog to avoid keeping references to
         // a view with an existing parent.
         View dialogView = inflater.inflate(R.layout.dialog_task, null);
-        EditText editText = dialogView.findViewById(R.id.edit_task);
-        editText.setText(task.title);
+        EditText editTitle = dialogView.findViewById(R.id.edit_title);
+        EditText editDesc = dialogView.findViewById(R.id.edit_description);
+        editTitle.setText(task.title);
+        editDesc.setText(task.description);
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.edit_task)
                 // Use the entire layout as the custom dialog view.
                 .setView(dialogView)
                 .setPositiveButton(R.string.save, (d, w) -> {
-                    String text = editText.getText().toString().trim();
-                    if (!text.isEmpty()) {
-                        task.title = text;
+                    String title = editTitle.getText().toString().trim();
+                    String desc = editDesc.getText().toString().trim();
+                    if (title.isEmpty()) {
+                        editTitle.setError(getString(R.string.title_hint));
+                    } else {
+                        task.title = title;
+                        task.description = desc;
                         repository.update(task);
                         loadTasks();
                     }
@@ -106,9 +170,15 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
 
     @Override
     public void onDelete(Task task) {
-        repository.delete(task);
-        loadTasks();
-        Toast.makeText(this, R.string.delete, Toast.LENGTH_SHORT).show();
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.confirm_delete)
+                .setPositiveButton(R.string.delete, (d, w) -> {
+                    repository.delete(task);
+                    loadTasks();
+                    Toast.makeText(this, R.string.delete, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     @Override
