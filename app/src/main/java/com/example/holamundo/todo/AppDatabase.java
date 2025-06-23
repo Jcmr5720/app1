@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 /**
  * Base de datos Room que almacena las tareas.
  */
-@Database(entities = {Task.class}, version = 1)
+@Database(entities = {Task.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract TaskDao taskDao();
 
@@ -23,7 +23,10 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "tasks.db").build();
+                            AppDatabase.class, "tasks.db")
+                            // El esquema es sencillo, en caso de cambio se recrea la BD
+                            .fallbackToDestructiveMigration()
+                            .build();
                 }
             }
         }

@@ -38,6 +38,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         notifyDataSetChanged();
     }
 
+    /** Devuelve la tarea en la posición indicada. */
+    public Task getTask(int position) {
+        return tasks.get(position);
+    }
+
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -60,6 +65,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     class TaskViewHolder extends RecyclerView.ViewHolder {
         final CheckBox checkCompleted;
         final TextView textTitle;
+        final TextView textDescription;
         final ImageButton buttonEdit;
         final ImageButton buttonDelete;
 
@@ -67,6 +73,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             super(itemView);
             checkCompleted = itemView.findViewById(R.id.check_completed);
             textTitle = itemView.findViewById(R.id.text_title);
+            textDescription = itemView.findViewById(R.id.text_description);
             buttonEdit = itemView.findViewById(R.id.button_edit);
             buttonDelete = itemView.findViewById(R.id.button_delete);
         }
@@ -75,6 +82,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             checkCompleted.setOnCheckedChangeListener(null);
             checkCompleted.setChecked(task.completed);
             textTitle.setText(task.title);
+            textDescription.setText(task.description);
             checkCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (listener != null) listener.onToggle(task, isChecked);
             });

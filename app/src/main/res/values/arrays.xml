@@ -1,0 +1,12 @@
+<resources>
+    <string-array name="filters">
+        <item>@string/filter_all</item>
+        <item>@string/filter_completed</item>
+        <item>@string/filter_pending</item>
+    </string-array>
+    <string-array name="filters_values">
+        <item>ALL</item>
+        <item>DONE</item>
+        <item>PENDING</item>
+    </string-array>
+</resources>
