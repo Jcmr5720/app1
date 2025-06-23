@@ -54,12 +54,16 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
 
     private void showAddDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
-        EditText editText = (EditText) inflater.inflate(R.layout.dialog_task, null).
-                findViewById(R.id.edit_task);
+        // Inflate a fresh instance of the dialog layout each time to avoid
+        // reusing a view that already has a parent.
+        View dialogView = inflater.inflate(R.layout.dialog_task, null);
+        EditText editText = dialogView.findViewById(R.id.edit_task);
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.add_task)
-                .setView(editText)
+                // Pass the whole inflated layout to the dialog so that the EditText
+                // does not already have a parent when added.
+                .setView(dialogView)
                 .setPositiveButton(R.string.save, (d, w) -> {
                     String text = editText.getText().toString().trim();
                     if (!text.isEmpty()) {
@@ -74,13 +78,16 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
 
     private void showEditDialog(Task task) {
         LayoutInflater inflater = LayoutInflater.from(this);
-        EditText editText = (EditText) inflater.inflate(R.layout.dialog_task, null).
-                findViewById(R.id.edit_task);
+        // Inflate a new view for the dialog to avoid keeping references to
+        // a view with an existing parent.
+        View dialogView = inflater.inflate(R.layout.dialog_task, null);
+        EditText editText = dialogView.findViewById(R.id.edit_task);
         editText.setText(task.title);
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.edit_task)
-                .setView(editText)
+                // Use the entire layout as the custom dialog view.
+                .setView(dialogView)
                 .setPositiveButton(R.string.save, (d, w) -> {
                     String text = editText.getText().toString().trim();
                     if (!text.isEmpty()) {
