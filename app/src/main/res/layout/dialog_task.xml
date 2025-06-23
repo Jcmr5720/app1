@@ -16,4 +16,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/description_hint" />
+
+    <Spinner
+        android:id="@+id/spinner_priority"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/priority" />
+
+    <Spinner
+        android:id="@+id/spinner_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/category" />
+
+    <EditText
+        android:id="@+id/edit_due_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/due_date"
+        android:inputType="date" />
 </LinearLayout>

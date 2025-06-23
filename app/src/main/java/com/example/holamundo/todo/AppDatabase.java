@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 /**
  * Base de datos Room que almacena las tareas.
  */
-@Database(entities = {Task.class}, version = 2)
+@Database(entities = {Task.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract TaskDao taskDao();
 
