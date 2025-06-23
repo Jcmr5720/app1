@@ -2,6 +2,7 @@ package com.example.holamundo.todo;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -13,8 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.holamundo.R;
-
-import java.util.List;
 
 /**
  * Activity principal que muestra la lista de tareas.
