@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.holamundo.R;
@@ -20,6 +21,9 @@ import java.util.List;
  */
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
     private final List<Task> tasks = new ArrayList<>();
+    public TaskAdapter() {
+        setHasStableIds(true); // Mejora animaciones al mantener IDs estables
+    }
     private TaskActionsListener listener;
 
     interface TaskActionsListener {
@@ -33,9 +37,34 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     public void setTasks(List<Task> list) {
+        List<Task> old = new ArrayList<>(tasks);
         tasks.clear();
         if (list != null) tasks.addAll(list);
-        notifyDataSetChanged();
+        DiffUtil.DiffResult diff = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() { return old.size(); }
+            @Override
+            public int getNewListSize() { return tasks.size(); }
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return old.get(oldItemPosition).id == tasks.get(newItemPosition).id;
+            }
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                Task o = old.get(oldItemPosition);
+                Task n = tasks.get(newItemPosition);
+                return o.completed == n.completed &&
+                        o.title.equals(n.title) &&
+                        ((o.description == null && n.description == null) ||
+                         (o.description != null && o.description.equals(n.description)));
+            }
+        });
+        diff.dispatchUpdatesTo(this);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return tasks.get(position).id;
     }
 
     /** Devuelve la tarea en la posición indicada. */
