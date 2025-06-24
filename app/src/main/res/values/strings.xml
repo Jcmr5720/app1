@@ -17,4 +17,10 @@
     <string name="due_date">Due date</string>
     <string name="attachment">Attachment URI</string>
     <string name="repeat">Repeat</string>
+    <!-- Strings para tableros estilo Trello -->
+    <string name="title_boards">Tableros</string>
+    <string name="add_board">Añadir tablero</string>
+    <string name="edit_board">Editar tablero</string>
+    <string name="confirm_delete_board">¿Eliminar este tablero?</string>
+    <string name="open_board">Abriendo %1$s</string>
 </resources>

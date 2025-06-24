@@ -6,13 +6,21 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.example.holamundo.trello.Board;
+import com.example.holamundo.trello.Lista;
+import com.example.holamundo.trello.Tarjeta;
+
 /**
  * Base de datos Room que almacena las tareas.
  */
-@Database(entities = {Task.class, SubTask.class}, version = 4)
+@Database(entities = {Task.class, SubTask.class, Board.class, Lista.class, Tarjeta.class}, version = 5)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract TaskDao taskDao();
     public abstract SubTaskDao subTaskDao();
+    // Nuevos DAOs para la funcionalidad estilo Trello
+    public abstract com.example.holamundo.trello.BoardDao boardDao();
+    public abstract com.example.holamundo.trello.ListaDao listaDao();
+    public abstract com.example.holamundo.trello.TarjetaDao tarjetaDao();
 
     private static volatile AppDatabase INSTANCE;
 
