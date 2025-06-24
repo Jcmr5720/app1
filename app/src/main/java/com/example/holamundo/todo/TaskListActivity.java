@@ -206,6 +206,8 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         Spinner spinnerPriority = dialogView.findViewById(R.id.spinner_priority);
         Spinner spinnerCategory = dialogView.findViewById(R.id.spinner_category);
         EditText editDue = dialogView.findViewById(R.id.edit_due_date);
+        EditText editAttachment = dialogView.findViewById(R.id.edit_attachment);
+        Spinner spinnerRepeat = dialogView.findViewById(R.id.spinner_repeat);
 
         ArrayAdapter<CharSequence> pAdapter = ArrayAdapter.createFromResource(this,
                 R.array.priorities, android.R.layout.simple_spinner_item);
