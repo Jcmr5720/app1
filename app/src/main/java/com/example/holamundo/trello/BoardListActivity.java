@@ -30,13 +30,14 @@ public class BoardListActivity extends AppCompatActivity implements BoardAdapter
         setTitle(R.string.title_boards);
 
         repository = new BoardRepository(this);
+        // El adaptador se encarga de habilitar los IDs estables en su constructor
+        // para evitar llamar a setHasStableIds una vez registrado.
         adapter = new BoardAdapter();
         adapter.setListener(this);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_boards);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        adapter.setHasStableIds(true);
 
         FloatingActionButton fab = findViewById(R.id.fab_add_board);
         fab.setOnClickListener(v -> showAddDialog());
