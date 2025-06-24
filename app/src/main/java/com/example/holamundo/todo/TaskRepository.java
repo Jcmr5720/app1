@@ -6,16 +6,22 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+// Clases de la base de datos
+import com.example.holamundo.todo.SubTask;
+import com.example.holamundo.todo.SubTaskDao;
+
 /**
  * Repositorio que maneja las operaciones de base de datos en hilos de fondo.
  */
 public class TaskRepository {
     private final TaskDao dao;
+    private final SubTaskDao subTaskDao;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public TaskRepository(Context context) {
         AppDatabase db = AppDatabase.getInstance(context);
         dao = db.taskDao();
+        subTaskDao = db.subTaskDao();
     }
 
     public interface TasksCallback {
@@ -64,5 +70,32 @@ public class TaskRepository {
 
     public void delete(Task task) {
         executor.execute(() -> dao.delete(task));
+    }
+
+    // ----- SubTasks -----
+    public interface SubTasksCallback {
+        void onResult(List<SubTask> subTasks);
+    }
+
+    public void getSubTasks(long taskId, SubTasksCallback callback) {
+        executor.execute(() -> {
+            List<SubTask> list = subTaskDao.getForTask(taskId);
+            if (callback != null) callback.onResult(list);
+        });
+    }
+
+    public void insertSubTask(SubTask subTask, Runnable finished) {
+        executor.execute(() -> {
+            subTaskDao.insert(subTask);
+            if (finished != null) finished.run();
+        });
+    }
+
+    public void updateSubTask(SubTask subTask) {
+        executor.execute(() -> subTaskDao.update(subTask));
+    }
+
+    public void deleteSubTask(SubTask subTask) {
+        executor.execute(() -> subTaskDao.delete(subTask));
     }
 }

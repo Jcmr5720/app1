@@ -20,4 +20,11 @@
         <item>DONE</item>
         <item>PENDING</item>
     </string-array>
+
+    <string-array name="repeat_options">
+        <item>None</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+    </string-array>
 </resources>

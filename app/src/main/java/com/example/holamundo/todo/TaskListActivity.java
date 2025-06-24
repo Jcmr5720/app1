@@ -146,6 +146,8 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         Spinner spinnerPriority = dialogView.findViewById(R.id.spinner_priority);
         Spinner spinnerCategory = dialogView.findViewById(R.id.spinner_category);
         EditText editDue = dialogView.findViewById(R.id.edit_due_date);
+        EditText editAttachment = dialogView.findViewById(R.id.edit_attachment);
+        Spinner spinnerRepeat = dialogView.findViewById(R.id.spinner_repeat);
 
         ArrayAdapter<CharSequence> pAdapter = ArrayAdapter.createFromResource(this,
                 R.array.priorities, android.R.layout.simple_spinner_item);
@@ -156,6 +158,11 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
                 R.array.categories, android.R.layout.simple_spinner_item);
         cAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategory.setAdapter(cAdapter);
+
+        ArrayAdapter<CharSequence> rAdapter = ArrayAdapter.createFromResource(this,
+                R.array.repeat_options, android.R.layout.simple_spinner_item);
+        rAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRepeat.setAdapter(rAdapter);
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.add_task)
@@ -173,6 +180,8 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
                         task.description = desc;
                         task.priority = spinnerPriority.getSelectedItemPosition();
                         task.category = spinnerCategory.getSelectedItem().toString();
+                        task.repeatInterval = spinnerRepeat.getSelectedItemPosition();
+                        task.attachmentUri = editAttachment.getText().toString().trim();
                         String dueText = editDue.getText().toString().trim();
                         if (!dueText.isEmpty()) {
                             try {
@@ -210,6 +219,13 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         spinnerCategory.setAdapter(cAdapter);
         int cIndex = java.util.Arrays.asList(getResources().getStringArray(R.array.categories)).indexOf(task.category);
         if (cIndex >= 0) spinnerCategory.setSelection(cIndex);
+
+        ArrayAdapter<CharSequence> rAdapter = ArrayAdapter.createFromResource(this,
+                R.array.repeat_options, android.R.layout.simple_spinner_item);
+        rAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRepeat.setAdapter(rAdapter);
+        spinnerRepeat.setSelection(task.repeatInterval);
+        if (task.attachmentUri != null) editAttachment.setText(task.attachmentUri);
         if (task.dueDate != null && task.dueDate > 0) {
             java.text.DateFormat df = java.text.DateFormat.getDateInstance();
             editDue.setText(df.format(new java.util.Date(task.dueDate)));
@@ -231,6 +247,8 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
                         task.description = desc;
                         task.priority = spinnerPriority.getSelectedItemPosition();
                         task.category = spinnerCategory.getSelectedItem().toString();
+                        task.repeatInterval = spinnerRepeat.getSelectedItemPosition();
+                        task.attachmentUri = editAttachment.getText().toString().trim();
                         String dueText = editDue.getText().toString().trim();
                         if (!dueText.isEmpty()) {
                             try {
