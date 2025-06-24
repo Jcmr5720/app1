@@ -16,6 +16,21 @@ public class Task {
     /** Descripción detallada de la tarea. */
     public String description;
 
+    /** Categoría de la tarea (p.ej. Trabajo, Personal). */
+    public String category;
+
+    /** Prioridad 0=baja,1=media,2=alta. */
+    public int priority;
+
+    /** Fecha límite en milisegundos. */
+    public Long dueDate;
+
+    /** Ruta al archivo adjunto (opcional). */
+    public String attachmentUri;
+
+    /** Frecuencia de repetición 0=ninguna,1=daily,2=weekly,3=monthly */
+    public int repeatInterval;
+
     /** Marca temporal de creación en milisegundos. */
     public long createdAt;
 

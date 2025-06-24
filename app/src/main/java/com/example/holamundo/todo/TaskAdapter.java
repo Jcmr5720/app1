@@ -56,7 +56,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 return o.completed == n.completed &&
                         o.title.equals(n.title) &&
                         ((o.description == null && n.description == null) ||
-                         (o.description != null && o.description.equals(n.description)));
+                         (o.description != null && o.description.equals(n.description))) &&
+                        ((o.category == null && n.category == null) ||
+                         (o.category != null && o.category.equals(n.category))) &&
+                        o.priority == n.priority &&
+                        ((o.dueDate == null && n.dueDate == null) ||
+                         (o.dueDate != null && o.dueDate.equals(n.dueDate)));
             }
         });
         diff.dispatchUpdatesTo(this);
@@ -95,6 +100,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         final CheckBox checkCompleted;
         final TextView textTitle;
         final TextView textDescription;
+        final TextView textDueDate;
+        final TextView textRepeat;
+        final TextView textAttachment;
+        final TextView textCategory;
         final ImageButton buttonEdit;
         final ImageButton buttonDelete;
 
@@ -103,6 +112,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             checkCompleted = itemView.findViewById(R.id.check_completed);
             textTitle = itemView.findViewById(R.id.text_title);
             textDescription = itemView.findViewById(R.id.text_description);
+            textDueDate = itemView.findViewById(R.id.text_due_date);
+            textRepeat = itemView.findViewById(R.id.text_repeat);
+            textAttachment = itemView.findViewById(R.id.text_attachment);
+            textCategory = itemView.findViewById(R.id.text_category);
             buttonEdit = itemView.findViewById(R.id.button_edit);
             buttonDelete = itemView.findViewById(R.id.button_delete);
         }
@@ -112,6 +125,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             checkCompleted.setChecked(task.completed);
             textTitle.setText(task.title);
             textDescription.setText(task.description);
+            if (task.dueDate != null && task.dueDate > 0) {
+                java.text.DateFormat df = java.text.DateFormat.getDateInstance();
+                textDueDate.setText(df.format(new java.util.Date(task.dueDate)));
+            } else {
+                textDueDate.setText("");
+            }
+            String[] repeatValues = itemView.getResources().getStringArray(R.array.repeat_options);
+            if (task.repeatInterval >= 0 && task.repeatInterval < repeatValues.length) {
+                textRepeat.setText(repeatValues[task.repeatInterval]);
+            } else {
+                textRepeat.setText("-");
+            }
+            textAttachment.setText(task.attachmentUri == null ? "" : task.attachmentUri);
+            textCategory.setText(task.category);
             checkCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (listener != null) listener.onToggle(task, isChecked);
             });

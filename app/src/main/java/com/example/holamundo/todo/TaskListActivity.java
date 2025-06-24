@@ -57,6 +57,21 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 
+        Spinner spinnerCategoryFilter = findViewById(R.id.spinner_category_filter);
+        ArrayAdapter<CharSequence> catAdapter = ArrayAdapter.createFromResource(this,
+                R.array.categories, android.R.layout.simple_spinner_item);
+        catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategoryFilter.setAdapter(catAdapter);
+        spinnerCategoryFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                loadTasks();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
         RecyclerView recyclerView = findViewById(R.id.recycler_tasks);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -94,7 +109,21 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
     }
 
     private void loadTasks() {
-        TaskRepository.TasksCallback callback = tasks -> runOnUiThread(() -> adapter.setTasks(tasks));
+        Spinner catSpinner = findViewById(R.id.spinner_category_filter);
+        String selectedCat = (String) catSpinner.getSelectedItem();
+        TaskRepository.TasksCallback callback = tasks -> {
+            if (selectedCat != null && !selectedCat.isEmpty()) {
+                if (!selectedCat.equalsIgnoreCase("All")) {
+                    java.util.List<Task> filtered = new java.util.ArrayList<>();
+                    for (Task t : tasks) {
+                        if (selectedCat.equals(t.category)) filtered.add(t);
+                    }
+                    tasks = filtered;
+                }
+            }
+            java.util.List<Task> finalList = tasks;
+            runOnUiThread(() -> adapter.setTasks(finalList));
+        };
         switch (currentFilter) {
             case "DONE":
                 repository.getCompleted(callback);
@@ -114,6 +143,26 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         View dialogView = inflater.inflate(R.layout.dialog_task, null);
         EditText editTitle = dialogView.findViewById(R.id.edit_title);
         EditText editDesc = dialogView.findViewById(R.id.edit_description);
+        Spinner spinnerPriority = dialogView.findViewById(R.id.spinner_priority);
+        Spinner spinnerCategory = dialogView.findViewById(R.id.spinner_category);
+        EditText editDue = dialogView.findViewById(R.id.edit_due_date);
+        EditText editAttachment = dialogView.findViewById(R.id.edit_attachment);
+        Spinner spinnerRepeat = dialogView.findViewById(R.id.spinner_repeat);
+
+        ArrayAdapter<CharSequence> pAdapter = ArrayAdapter.createFromResource(this,
+                R.array.priorities, android.R.layout.simple_spinner_item);
+        pAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPriority.setAdapter(pAdapter);
+
+        ArrayAdapter<CharSequence> cAdapter = ArrayAdapter.createFromResource(this,
+                R.array.categories, android.R.layout.simple_spinner_item);
+        cAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategory.setAdapter(cAdapter);
+
+        ArrayAdapter<CharSequence> rAdapter = ArrayAdapter.createFromResource(this,
+                R.array.repeat_options, android.R.layout.simple_spinner_item);
+        rAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRepeat.setAdapter(rAdapter);
 
         new AlertDialog.Builder(this)
                 .setTitle(R.string.add_task)
@@ -129,6 +178,17 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
                         Task task = new Task();
                         task.title = title;
                         task.description = desc;
+                        task.priority = spinnerPriority.getSelectedItemPosition();
+                        task.category = spinnerCategory.getSelectedItem().toString();
+                        task.repeatInterval = spinnerRepeat.getSelectedItemPosition();
+                        task.attachmentUri = editAttachment.getText().toString().trim();
+                        String dueText = editDue.getText().toString().trim();
+                        if (!dueText.isEmpty()) {
+                            try {
+                                java.text.DateFormat df = java.text.DateFormat.getDateInstance();
+                                task.dueDate = df.parse(dueText).getTime();
+                            } catch (Exception ignore) {}
+                        }
                         repository.insert(task, this::loadTasks);
                     }
                 })
@@ -143,6 +203,35 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
         View dialogView = inflater.inflate(R.layout.dialog_task, null);
         EditText editTitle = dialogView.findViewById(R.id.edit_title);
         EditText editDesc = dialogView.findViewById(R.id.edit_description);
+        Spinner spinnerPriority = dialogView.findViewById(R.id.spinner_priority);
+        Spinner spinnerCategory = dialogView.findViewById(R.id.spinner_category);
+        EditText editDue = dialogView.findViewById(R.id.edit_due_date);
+        EditText editAttachment = dialogView.findViewById(R.id.edit_attachment);
+        Spinner spinnerRepeat = dialogView.findViewById(R.id.spinner_repeat);
+
+        ArrayAdapter<CharSequence> pAdapter = ArrayAdapter.createFromResource(this,
+                R.array.priorities, android.R.layout.simple_spinner_item);
+        pAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPriority.setAdapter(pAdapter);
+        spinnerPriority.setSelection(task.priority);
+
+        ArrayAdapter<CharSequence> cAdapter = ArrayAdapter.createFromResource(this,
+                R.array.categories, android.R.layout.simple_spinner_item);
+        cAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategory.setAdapter(cAdapter);
+        int cIndex = java.util.Arrays.asList(getResources().getStringArray(R.array.categories)).indexOf(task.category);
+        if (cIndex >= 0) spinnerCategory.setSelection(cIndex);
+
+        ArrayAdapter<CharSequence> rAdapter = ArrayAdapter.createFromResource(this,
+                R.array.repeat_options, android.R.layout.simple_spinner_item);
+        rAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRepeat.setAdapter(rAdapter);
+        spinnerRepeat.setSelection(task.repeatInterval);
+        if (task.attachmentUri != null) editAttachment.setText(task.attachmentUri);
+        if (task.dueDate != null && task.dueDate > 0) {
+            java.text.DateFormat df = java.text.DateFormat.getDateInstance();
+            editDue.setText(df.format(new java.util.Date(task.dueDate)));
+        }
         editTitle.setText(task.title);
         editDesc.setText(task.description);
 
@@ -158,6 +247,19 @@ public class TaskListActivity extends AppCompatActivity implements TaskAdapter.T
                     } else {
                         task.title = title;
                         task.description = desc;
+                        task.priority = spinnerPriority.getSelectedItemPosition();
+                        task.category = spinnerCategory.getSelectedItem().toString();
+                        task.repeatInterval = spinnerRepeat.getSelectedItemPosition();
+                        task.attachmentUri = editAttachment.getText().toString().trim();
+                        String dueText = editDue.getText().toString().trim();
+                        if (!dueText.isEmpty()) {
+                            try {
+                                java.text.DateFormat df = java.text.DateFormat.getDateInstance();
+                                task.dueDate = df.parse(dueText).getTime();
+                            } catch (Exception ignore) {}
+                        } else {
+                            task.dueDate = null;
+                        }
                         repository.update(task);
                         loadTasks();
                     }

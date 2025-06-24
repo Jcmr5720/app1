@@ -12,4 +12,9 @@
     <string name="filter_completed">Completed</string>
     <string name="filter_pending">Pending</string>
     <string name="title_tasks">Tasks</string>
+    <string name="category">Category</string>
+    <string name="priority">Priority</string>
+    <string name="due_date">Due date</string>
+    <string name="attachment">Attachment URI</string>
+    <string name="repeat">Repeat</string>
 </resources>
