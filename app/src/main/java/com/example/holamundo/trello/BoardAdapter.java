@@ -19,6 +19,15 @@ import java.util.List;
  * Adaptador para mostrar tableros en un RecyclerView.
  */
 public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.BoardViewHolder> {
+    /**
+     * Constructor que habilita los IDs estables desde el inicio para evitar
+     * cambiarlos una vez el adaptador se haya registrado en el RecyclerView.
+     */
+    public BoardAdapter() {
+        // Habilitamos los IDs estables antes de que se registren observadores
+        // tal y como recomienda la documentación de RecyclerView.
+        setHasStableIds(true);
+    }
     private final List<Board> boards = new ArrayList<>();
     private BoardActionsListener listener;
 
