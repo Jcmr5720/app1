@@ -25,6 +25,12 @@ public class Task {
     /** Fecha límite en milisegundos. */
     public Long dueDate;
 
+    /** Ruta al archivo adjunto (opcional). */
+    public String attachmentUri;
+
+    /** Frecuencia de repetición 0=ninguna,1=daily,2=weekly,3=monthly */
+    public int repeatInterval;
+
     /** Marca temporal de creación en milisegundos. */
     public long createdAt;
 

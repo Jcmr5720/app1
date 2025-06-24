@@ -101,6 +101,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         final TextView textTitle;
         final TextView textDescription;
         final TextView textDueDate;
+        final TextView textRepeat;
+        final TextView textAttachment;
         final TextView textCategory;
         final ImageButton buttonEdit;
         final ImageButton buttonDelete;
@@ -111,6 +113,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             textTitle = itemView.findViewById(R.id.text_title);
             textDescription = itemView.findViewById(R.id.text_description);
             textDueDate = itemView.findViewById(R.id.text_due_date);
+            textRepeat = itemView.findViewById(R.id.text_repeat);
+            textAttachment = itemView.findViewById(R.id.text_attachment);
             textCategory = itemView.findViewById(R.id.text_category);
             buttonEdit = itemView.findViewById(R.id.button_edit);
             buttonDelete = itemView.findViewById(R.id.button_delete);
@@ -127,6 +131,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             } else {
                 textDueDate.setText("");
             }
+            String[] repeatValues = itemView.getResources().getStringArray(R.array.repeat_options);
+            if (task.repeatInterval >= 0 && task.repeatInterval < repeatValues.length) {
+                textRepeat.setText(repeatValues[task.repeatInterval]);
+            } else {
+                textRepeat.setText("-");
+            }
+            textAttachment.setText(task.attachmentUri == null ? "" : task.attachmentUri);
             textCategory.setText(task.category);
             checkCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (listener != null) listener.onToggle(task, isChecked);

@@ -35,4 +35,16 @@
         android:layout_height="wrap_content"
         android:hint="@string/due_date"
         android:inputType="date" />
+
+    <EditText
+        android:id="@+id/edit_attachment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/attachment" />
+
+    <Spinner
+        android:id="@+id/spinner_repeat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/repeat" />
 </LinearLayout>
